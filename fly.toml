@@ -1,6 +1,6 @@
 # fly.toml file generated for installer on 2023-06-13T22:48:35+10:00
 
-app = "installer"
+app = "installer-icn"
 kill_signal = "SIGINT"
 kill_timeout = 5
 
