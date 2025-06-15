@@ -68,7 +68,10 @@ type Handler struct {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/healthz" || r.URL.Path == "/favicon.ico" {
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("OK"))
+		_, err := w.Write([]byte("OK"))
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	// calculate response type
@@ -179,7 +182,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// no render script? just output as json
 	if script == "" {
 		b, _ := json.MarshalIndent(result, "", "  ")
-		_, _ = w.Write(b)
+		_, err := w.Write(b)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	// load template
@@ -196,7 +202,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("serving script %s/%s@%s (%s)", result.User, result.Program, result.Release, ext)
 	// ready
-	_, _ = w.Write(buff.Bytes())
+	_, err = w.Write(buff.Bytes())
+	if err != nil {
+		panic(err)
+	}
 }
 
 type Asset struct {
