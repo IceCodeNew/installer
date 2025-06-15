@@ -21,7 +21,9 @@ func getGHProxy() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch ghproxy.link: %s", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("requested site '%s' returned a non-200 status code: %s", srcGHProxy, resp.Status)
 	}
@@ -35,7 +37,7 @@ func getGHProxy() (string, error) {
 		re = regexp.MustCompile(`<div class=\\\\\\"domain-status\\\\\\".*><div class=\\\\\\"domain-name\\\\\\".*><a .*>(https?://.+)</a></div><div class=\\\\\\"status-text green-text\\\\\\".*>`)
 	)
 	for _, b := range body {
-		if !(b == '\r' || b == '\n' || b == '\t' || b == '\f' || b == '\v') {
+		if b != '\r' && b != '\n' && b != '\t' && b != '\f' && b != '\v' {
 			body[i] = b
 			i++
 		}
@@ -250,7 +252,9 @@ func (as ghAssets) getSumIndex() (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	// take each line and insert into the index
 	index := map[string]string{}
 	s := bufio.NewScanner(resp.Body)

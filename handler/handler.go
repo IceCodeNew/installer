@@ -66,7 +66,10 @@ type Handler struct {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/healthz" || r.URL.Path == "/favicon.ico" {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, err := w.Write([]byte("OK"))
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	// calculate response type
@@ -141,7 +144,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// no program? treat first part as program, use default user
 	if q.Program == "" {
 		q.Program = q.User
-		q.User = h.Config.User
+		q.User = h.User
 		q.Search = true
 	}
 	if q.Release == "" {
@@ -152,11 +155,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		q.User = "zyedidia"
 	}
 	// force user/repo
-	if h.Config.ForceUser != "" {
-		q.User = h.Config.ForceUser
+	if h.ForceUser != "" {
+		q.User = h.ForceUser
 	}
-	if h.Config.ForceRepo != "" {
-		q.Program = h.Config.ForceRepo
+	if h.ForceRepo != "" {
+		q.Program = h.ForceRepo
 	}
 	// validate query
 	valid := q.Program != ""
@@ -178,7 +181,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// no render script? just output as json
 	if script == "" {
 		b, _ := json.MarshalIndent(result, "", "  ")
-		w.Write(b)
+		_, err := w.Write(b)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	// load template
@@ -195,7 +201,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("serving script %s/%s@%s (%s)", result.User, result.Program, result.Release, ext)
 	// ready
-	w.Write(buff.Bytes())
+	_, err = w.Write(buff.Bytes())
+	if err != nil {
+		panic(err)
+	}
 }
 
 type Asset struct {
@@ -233,14 +242,16 @@ func (as Assets) HasM1() bool {
 func (h *Handler) get(url string, v interface{}) error {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
-	if h.Config.Token != "" {
-		req.Header.Set("Authorization", "token "+h.Config.Token)
+	if h.Token != "" {
+		req.Header.Set("Authorization", "token "+h.Token)
 	}
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("request failed: %s: %s", url, err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode == 404 {
 		return fmt.Errorf("%w: url %s", errNotFound, url)
