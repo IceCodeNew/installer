@@ -1,6 +1,5 @@
 name: Image CI
-permissions:
-  contents: read
+permissions: {}
 
 on:
   push:
