@@ -1,8 +1,6 @@
 module github.com/jpillora/installer
 
-go 1.21.5
-
-toolchain go1.25.1
+go 1.21
 
 require (
 	github.com/jpillora/opts v1.2.3
