@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sort"
@@ -11,7 +12,48 @@ import (
 	"time"
 )
 
+var ghProxy string
+
+func getGHProxy() (string, error) {
+	const srcGHProxy = `https://ghproxy.link/js/src_views_home_HomeView_vue.js`
+	resp, err := http.Get(srcGHProxy)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch ghproxy.link: %s", err)
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("requested site '%s' returned a non-200 status code: %s", srcGHProxy, resp.Status)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body: %s", err)
+	}
+
+	i := 0
+	for _, b := range body {
+		if b != '\r' && b != '\n' && b != '\t' && b != '\f' && b != '\v' {
+			body[i] = b
+			i++
+		}
+	}
+	body = body[:i]
+
+	ghProxy := availableMirrorRe.FindSubmatch(body)
+	if len(ghProxy) < 2 {
+		return "", fmt.Errorf("failed to find available GitHub proxy server")
+	}
+	return string(ghProxy[1]), nil
+}
+
 func (h *Handler) execute(q Query) (QueryResult, error) {
+	_ghProxy, err := getGHProxy()
+	if err != nil {
+		log.Printf("Failed to get GitHub proxy: %s", err)
+	}
+	ghProxy = _ghProxy
+
 	// load from cache
 	key := q.cacheKey()
 	h.cacheMut.Lock()
@@ -169,6 +211,10 @@ func (h *Handler) getAssetsNoCache(q Query) (string, Assets, error) {
 		if q.Select != "" && !strings.Contains(ga.Name, q.Select) {
 			log.Printf("select excludes asset: %s", ga.Name)
 			continue
+		}
+		// append ghproxy to the url
+		if q.GHProxy {
+			url = ghProxy + "/" + url
 		}
 		asset := Asset{
 			OS:     os,
