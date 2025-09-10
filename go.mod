@@ -2,7 +2,7 @@ module github.com/jpillora/installer
 
 go 1.24
 
-toolchain go1.24.3
+toolchain go1.25.1
 
 require (
 	github.com/jpillora/opts v1.1.2
