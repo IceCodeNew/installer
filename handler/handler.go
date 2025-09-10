@@ -38,6 +38,7 @@ type Query struct {
 	MoveToPath, Search, Insecure bool
 	SudoMove                     bool   // deprecated: not used, now automatically detected
 	OS, Arch                     string // override OS and Arch
+	GHProxy                      bool
 }
 
 type QueryResult struct {
@@ -128,6 +129,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Select:    r.URL.Query().Get("select"),
 		OS:        r.URL.Query().Get("os"),
 		Arch:      r.URL.Query().Get("arch"),
+		GHProxy:   r.URL.Query().Get("ghproxy") == "1",
 	}
 	// set query from route
 	path := strings.TrimPrefix(r.URL.Path, "/")
