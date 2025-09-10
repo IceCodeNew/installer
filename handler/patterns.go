@@ -49,7 +49,8 @@ var (
 )
 
 var (
-	checksumRe     = regexp.MustCompile(`(checksums|sha256sums)`)
-	fileExtRe      = regexp.MustCompile(`(\.tar)?(\.[a-z][a-z0-9]+)$`)
-	searchGithubRe = regexp.MustCompile(`https:\/\/github\.com\/(\w+)\/(\w+)`)
+	availableMirrorRe = regexp.MustCompile(`<div class=\\\\\\"domain-status\\\\\\".*><div class=\\\\\\"domain-name\\\\\\".*><a .*>(https?://.+)</a></div><div class=\\\\\\"status-text green-text\\\\\\".*>`)
+	checksumRe        = regexp.MustCompile(`(checksums|sha256sums)`)
+	fileExtRe         = regexp.MustCompile(`(\.tar)?(\.[a-z][a-z0-9]+)$`)
+	searchGithubRe    = regexp.MustCompile(`https:\/\/github\.com\/(\w+)\/(\w+)`)
 )
