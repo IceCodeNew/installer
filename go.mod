@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/jpillora/opts v1.2.3
 	github.com/jpillora/requestlog/v2 v2.0.1
-	gopkg.in/dnaeon/go-vcr.v4 v4.0.5
+	gopkg.in/dnaeon/go-vcr.v4 v4.0.6
 )
 
 require (
@@ -22,5 +22,6 @@ require (
 	github.com/posener/complete v1.2.2-0.20190308074557-af07aa5181b3 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.3 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 )
