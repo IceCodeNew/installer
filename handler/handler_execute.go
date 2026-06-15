@@ -75,36 +75,25 @@ func (h *Handler) getAssetsNoCache(q Query) (string, Assets, error) {
 	release := q.Release
 	// not cached - ask github
 	log.Printf("fetching asset info for %s/%s@%s", user, repo, release)
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases", user, repo)
-	ghas := ghAssets{}
+	base := "https://api.github.com"
+	if h.GHAPI != "" {
+		base = h.GHAPI
+	}
+	url := fmt.Sprintf("%s/repos/%s/%s/releases", base, user, repo)
 	if release == "" || release == "latest" {
 		url += "/latest"
-		ghr := ghRelease{}
-		if err := h.get(url, &ghr); err != nil {
-			return release, nil, err
-		}
-		release = ghr.TagName // discovered
-		ghas = ghr.Assets
 	} else {
-		ghrs := []ghRelease{}
-		if err := h.get(url, &ghrs); err != nil {
-			return release, nil, err
-		}
-		found := false
-		for _, ghr := range ghrs {
-			if ghr.TagName == release {
-				found = true
-				if err := h.get(ghr.AssetsURL, &ghas); err != nil {
-					return release, nil, err
-				}
-				ghas = ghr.Assets
-				break
-			}
-		}
-		if !found {
-			return release, nil, fmt.Errorf("release tag '%s' not found", release)
-		}
+		url += "/tags/" + release
 	}
+	ghr := ghRelease{}
+	if err := h.get(url, &ghr); err != nil {
+		if errors.Is(err, errNotFound) && release != "" && release != "latest" {
+			return release, nil, fmt.Errorf("%w: release tag '%s'", errNotFound, release)
+		}
+		return release, nil, err
+	}
+	release = ghr.TagName
+	ghas := ghr.Assets
 	if len(ghas) == 0 {
 		return release, nil, errors.New("no assets found")
 	}
@@ -295,8 +284,8 @@ func (g ghAsset) IsChecksumFile() bool {
 }
 
 type ghRelease struct {
-	Assets    []ghAsset `json:"assets"`
-	AssetsURL string    `json:"assets_url"`
+	Assets    ghAssets `json:"assets"`
+	AssetsURL string   `json:"assets_url"`
 	Author    struct {
 		ID    int    `json:"id"`
 		Login string `json:"login"`

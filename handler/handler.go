@@ -61,6 +61,7 @@ func (q Query) cacheKey() string {
 type Handler struct {
 	Config
 	Client   *http.Client
+	GHAPI    string
 	cacheMut sync.Mutex
 	cache    map[string]QueryResult
 }

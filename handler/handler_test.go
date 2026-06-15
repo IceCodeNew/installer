@@ -378,3 +378,37 @@ func TestProtoc(t *testing.T) {
 	}
 	batchCheckAssets(t, w, testCases)
 }
+
+func TestOldReleaseBeyondPageSize(t *testing.T) {
+	const target = "v2024.1.0"
+	mux := http.NewServeMux()
+	mux.HandleFunc("/repos/acme/widget/releases", func(w http.ResponseWriter, r *http.Request) {
+		recent := make([]map[string]any, 0, 30)
+		for i := 30; i >= 1; i-- {
+			recent = append(recent, map[string]any{"tag_name": fmt.Sprintf("v2026.%d.0", i)})
+		}
+		json.NewEncoder(w).Encode(recent)
+	})
+	mux.HandleFunc("/repos/acme/widget/releases/tags/"+target, func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{
+			"tag_name": target,
+			"assets": []map[string]any{{
+				"name":                 "widget-" + target + "-linux-x86_64.tar.gz",
+				"browser_download_url": "https://example.com/widget-" + target + "-linux-x86_64.tar.gz",
+				"size":                 1048576,
+				"content_type":         "application/gzip",
+			}},
+		})
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	h := &handler.Handler{Client: srv.Client(), GHAPI: srv.URL}
+	r := httptest.NewRequest("GET", "/acme/widget@"+target+"?type=json", nil)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+	if w.Result().StatusCode != 200 {
+		t.Fatalf("expected 200, got %d: %s", w.Result().StatusCode, w.Body.String())
+	}
+	checkAsset(t, w, "linux/amd64", "widget-"+target+"-linux-x86_64.tar.gz")
+}
