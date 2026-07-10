@@ -208,6 +208,16 @@ func (a Asset) Key() string {
 	return a.OS + "/" + a.Arch
 }
 
+func (a Asset) preferredOver(other Asset) bool {
+	if am, om := strings.Contains(a.Name, "musl"), strings.Contains(other.Name, "musl"); am != om {
+		return am
+	}
+	if ag, og := strings.Contains(a.Name, "gnu"), strings.Contains(other.Name, "gnu"); ag != og {
+		return og
+	}
+	return a.Name < other.Name
+}
+
 func (a Asset) Is32Bit() bool {
 	return a.Arch == "386"
 }

@@ -412,3 +412,41 @@ func TestOldReleaseBeyondPageSize(t *testing.T) {
 	}
 	checkAsset(t, w, "linux/amd64", "widget-"+target+"-linux-x86_64.tar.gz")
 }
+
+func TestAssumedAssetDeterministic(t *testing.T) {
+	const target = "v1"
+	newAsset := func(name string) map[string]any {
+		return map[string]any{
+			"name":                 name,
+			"browser_download_url": "https://example.com/" + name,
+			"size":                 5 * 1024 * 1024,
+			"content_type":         "application/octet-stream",
+		}
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/repos/acme/tool/releases/tags/"+target, func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{
+			"tag_name": target,
+			"assets": []map[string]any{
+				newAsset("tool_linux.zip"),
+				newAsset("tool_musllinux.zip"),
+				newAsset("tool_linux_aarch64"),
+				newAsset("tool_musllinux_aarch64.zip"),
+			},
+		})
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	for i := 0; i < 100; i++ {
+		h := &handler.Handler{Client: srv.Client(), GHAPI: srv.URL}
+		r := httptest.NewRequest("GET", "/acme/tool@"+target+"?type=json", nil)
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		if w.Result().StatusCode != 200 {
+			t.Fatalf("iter %d: expected 200, got %d: %s", i, w.Result().StatusCode, w.Body.String())
+		}
+		checkAsset(t, w, "linux/amd64", "tool_musllinux.zip")
+		checkAsset(t, w, "linux/arm64", "tool_linux_aarch64")
+	}
+}

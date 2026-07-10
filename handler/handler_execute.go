@@ -198,12 +198,18 @@ func (h *Handler) getAssetsNoCache(q Query) (string, Assets, error) {
 		index[key] = asset
 	}
 
+	resolved := map[string]Asset{}
 	for _, cAsset := range candidates {
 		// "/loong64" will be assumed to be "linux/loong64"
 		if cAsset.OS == "" {
 			cAsset.OS = "linux"
 		}
 		indexKey := cAsset.Key()
+		if cur, exists := resolved[indexKey]; !exists || cAsset.preferredOver(cur) {
+			resolved[indexKey] = cAsset
+		}
+	}
+	for indexKey, cAsset := range resolved {
 		// and will only be selected if the exact match failed
 		if _, exists := index[indexKey]; !exists {
 			index[indexKey] = cAsset
