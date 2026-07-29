@@ -3,7 +3,7 @@ module github.com/jpillora/installer
 go 1.24
 
 require (
-	github.com/jpillora/opts v1.5.1
+	github.com/jpillora/opts v1.6.0
 	github.com/jpillora/requestlog/v2 v2.0.2
 	gopkg.in/dnaeon/go-vcr.v4 v4.0.7
 )
