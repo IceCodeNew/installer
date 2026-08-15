@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/jpillora/opts v1.6.0
-	github.com/jpillora/requestlog/v2 v2.0.2
+	github.com/jpillora/requestlog/v2 v2.0.3
 	gopkg.in/dnaeon/go-vcr.v4 v4.0.7
 )
 
