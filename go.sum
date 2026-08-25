@@ -11,8 +11,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/jpillora/jplog v1.0.2 h1:YHH89l5aYGDfcC83qsEUidAA798ue6r1HpXfYSrUeOI=
 github.com/jpillora/jplog v1.0.2/go.mod h1:1i8Xq+nwOjn9CkRPCQSDnkn68famatT+ZIuLbOgJAFQ=
-github.com/jpillora/opts v1.6.0 h1:BpF2S6iQ+fwhvwSTJBcEu+Q0jGlLOfN5o8qETSfya/Q=
-github.com/jpillora/opts v1.6.0/go.mod h1:qImEWPlyKljhTZZlYxhGbZVBTlJTibClZQRZbpNr/QM=
+github.com/jpillora/opts v1.8.0 h1:6fNSkWlCgAHixpVhCGbqwWKQTF/hOa71glADPyYrsec=
+github.com/jpillora/opts v1.8.0/go.mod h1:qImEWPlyKljhTZZlYxhGbZVBTlJTibClZQRZbpNr/QM=
 github.com/jpillora/requestlog/v2 v2.0.4 h1:xn6Lp4yAKOw5csWLVcq7lCZ7iopVzSs3RW9XFkCwO5s=
 github.com/jpillora/requestlog/v2 v2.0.4/go.mod h1:ykmhasOpd9vppWyrVypxyYXInolap1INjp28nmaYgHs=
 github.com/jpillora/sizestr v1.0.0 h1:4tr0FLxs1Mtq3TnsLDV+GYUWG7Q26a6s+tV5Zfw2ygw=
