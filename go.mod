@@ -3,7 +3,7 @@ module github.com/jpillora/installer
 go 1.24
 
 require (
-	github.com/jpillora/opts v1.8.1
+	github.com/jpillora/opts v1.8.2
 	github.com/jpillora/requestlog/v2 v2.0.4
 	gopkg.in/dnaeon/go-vcr.v4 v4.0.7
 )
@@ -15,7 +15,7 @@ require (
 	github.com/jpillora/jplog v1.0.2 // indirect
 	github.com/jpillora/sizestr v1.0.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
-	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/posener/complete v1.2.3 // indirect
